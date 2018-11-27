@@ -3,10 +3,12 @@
 https://youtu.be/GERcMGJsD3c
 
 Build (lGL, lGLU, lGLEW, lglut needed):
+
 `$ make`
 
 Run:
-`./snakegl`
+
+`$ ./snakegl`
 
 Controls:
 ```
