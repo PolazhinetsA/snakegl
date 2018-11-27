@@ -1,14 +1,14 @@
-### 3d snake game
+#### 3d snake game
 
 https://youtu.be/GERcMGJsD3c
 
-#### Build (lGL, lGLU, lGLEW, lglut needed):
+Build (lGL, lGLU, lGLEW, lglut needed):
 `$ make`
 
-#### Run:
+Run:
 `./snakegl`
 
-#### Controls:
+Controls:
 ```
 ,     - turn CW
 .     - turn CCW
