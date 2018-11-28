@@ -1,6 +1,6 @@
 #### 3d snake game
 
-https://youtu.be/GERcMGJsD3c
+https://youtu.be/efx-MN4MkO0
 
 Build (lGL, lGLU, lGLEW, lglut needed):
 
