@@ -9,8 +9,8 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#define N 20
-#define M 20
+#define N 16
+#define M 16
 
 enum {No, Ri, Do, Le, Up, Fo};
 

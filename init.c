@@ -3,9 +3,10 @@
 char field[N][M];
 struct snake_t snake;
 
-GLuint vao_id,
-       vbo_id,
-       prog_id;
+GLuint vao,
+       vbo,
+       ebo,
+       prog;
 
 GLint unif_loc[UNIF_NUM];
 
@@ -18,9 +19,6 @@ void init()
   snake.dir = Ri;
   memset (field, Ri, 5);
   field[0][6] = Fo;
-
-  glGenVertexArrays (1, &vao_id);
-  glBindVertexArray (vao_id);
 
   struct { float x, y, z, r, g, b; } arr[N][M][8];
 
@@ -47,21 +45,36 @@ void init()
     }
   }
 
-  glGenBuffers (1, &vbo_id);
-  glBindBuffer (GL_ARRAY_BUFFER, vbo_id);
+  GLubyte idx[] =
+  { 0, 1, 3, 2, -1,
+    0, 4, 1, 5, 2, 6, 3, 7, 0, 4, -1,
+    4, 5, 7, 6, -1 };
+
+  glGenVertexArrays (1, &vao);
+  glBindVertexArray (vao);
+
+  glGenBuffers (1, &vbo);
+  glBindBuffer (GL_ARRAY_BUFFER, vbo);
   glBufferData (GL_ARRAY_BUFFER, sizeof (arr), arr, GL_STATIC_DRAW);
 
-  prog_id = load_shaders ("snakegl.vert", "snakegl.frag");
-  glUseProgram (prog_id);
+  glGenBuffers (1, &ebo);
+  glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, ebo);
+  glBufferData (GL_ELEMENT_ARRAY_BUFFER, sizeof (idx), idx, GL_STATIC_DRAW);
+
+  glEnable (GL_PRIMITIVE_RESTART);
+  glPrimitiveRestartIndex (255);
+
+  prog = load_shaders ("snakegl.vert", "snakegl.frag");
+  glUseProgram (prog);
 
   glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, sizeof (arr[0][0][0]), (void*) 0);
   glVertexAttribPointer (1, 3, GL_FLOAT, GL_FALSE, sizeof (arr[0][0][0]), (void*) (3 * sizeof (float)));
   glEnableVertexAttribArray (0);
   glEnableVertexAttribArray (1);
 
-  unif_loc[UNIF_ROTM1] = glGetUniformLocation (prog_id, "rotm1");
-  unif_loc[UNIF_ROTM2] = glGetUniformLocation (prog_id, "rotm2");
-  unif_loc[UNIF_MOVV]  = glGetUniformLocation (prog_id, "movv");
+  unif_loc[UNIF_ROTM1] = glGetUniformLocation (prog, "rotm1");
+  unif_loc[UNIF_ROTM2] = glGetUniformLocation (prog, "rotm2");
+  unif_loc[UNIF_MOVV]  = glGetUniformLocation (prog, "movv");
 
   float
     rotm2[3][3] =
@@ -101,34 +114,34 @@ GLuint load_shaders(char *vpath, char *fpath)
   close (fd1);
   close (fd2);
 
-  int vert_shader_id = glCreateShader (GL_VERTEX_SHADER),
-      frag_shader_id = glCreateShader (GL_FRAGMENT_SHADER);
-  glShaderSource (vert_shader_id, 1, &pbuf1, NULL);
-  glShaderSource (frag_shader_id, 1, &pbuf2, NULL);
-  glCompileShader (vert_shader_id);
-  glCompileShader (frag_shader_id);
+  int vert_shader = glCreateShader (GL_VERTEX_SHADER),
+      frag_shader = glCreateShader (GL_FRAGMENT_SHADER);
+  glShaderSource (vert_shader, 1, &pbuf1, NULL);
+  glShaderSource (frag_shader, 1, &pbuf2, NULL);
+  glCompileShader (vert_shader);
+  glCompileShader (frag_shader);
 
   GLboolean status1, status2;
-  glGetShaderiv (vert_shader_id, GL_COMPILE_STATUS, &status1);
-  glGetShaderiv (frag_shader_id, GL_COMPILE_STATUS, &status2);
+  glGetShaderiv (vert_shader, GL_COMPILE_STATUS, &status1);
+  glGetShaderiv (frag_shader, GL_COMPILE_STATUS, &status2);
 
   if (! (status1 && status2)) {
     GLsizei sz, len1, len2;
-    glGetShaderiv (vert_shader_id, GL_INFO_LOG_LENGTH, &len1);
-    glGetShaderiv (frag_shader_id, GL_INFO_LOG_LENGTH, &len2);
+    glGetShaderiv (vert_shader, GL_INFO_LOG_LENGTH, &len1);
+    glGetShaderiv (frag_shader, GL_INFO_LOG_LENGTH, &len2);
     sz = (len1 > len2 ? len1 : len2) + 1;
     char buf[sz];
-    glGetShaderInfoLog (vert_shader_id, sz, NULL, buf);
+    glGetShaderInfoLog (vert_shader, sz, NULL, buf);
     puts (buf);
-    glGetShaderInfoLog (frag_shader_id, sz, NULL, buf);
+    glGetShaderInfoLog (frag_shader, sz, NULL, buf);
     puts (buf);
     exit (1);
   }
 
-  int prog_id = glCreateProgram();
-  glAttachShader (prog_id, vert_shader_id);
-  glAttachShader (prog_id, frag_shader_id);
-  glLinkProgram (prog_id);
+  int prog = glCreateProgram();
+  glAttachShader (prog, vert_shader);
+  glAttachShader (prog, frag_shader);
+  glLinkProgram (prog);
 
-  return prog_id;
+  return prog;
 }

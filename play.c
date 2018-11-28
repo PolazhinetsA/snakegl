@@ -7,13 +7,10 @@ void draw_func()
 {
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   for (int i = 0; i < N * M; ++i) {
-    if (((char*) field)[i]) {
-      glDrawArrays (GL_TRIANGLE_FAN, i*8+4, 4);
-      if (((char*) field)[i] == Fo)
-        glDrawArrays (GL_TRIANGLE_FAN, i*8, 4);
-    }
+    if (((char*) field)[i])
+      glDrawElementsInstancedBaseVertex (GL_TRIANGLE_STRIP, 15, GL_UNSIGNED_BYTE, (void*)5, ((char*)field)[i] == Fo ? 1 : 2, i*8);
     else
-      glDrawArrays (GL_TRIANGLE_FAN, i * 8, 4);
+      glDrawElementsBaseVertex (GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, (void*)0, i*8);
   }
   glFlush();
 }
@@ -57,7 +54,7 @@ void move_func (int dir)
     do fx = rand() % M, fy = rand() % N;
     while (field[fy][fx]);
     field[fy][fx] = Fo;
-    delay -= delay/20;
+    delay -= delay/40;
     ++score;
   } else {
     dx = dy = 0;
