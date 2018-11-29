@@ -12,8 +12,10 @@ uniform vec3 movv;
 void main()
 {
   vec4 pos = in_pos;
-  pos.z += 0.01 * gl_InstanceID;
+  if (gl_InstanceID == 1)
+    pos.z += 0.01;
   pos.xyz = pos.xyz * rotm1 * rotm2 + movv;
-  gl_Position = vec4 (pos.xy / -pos.z, pos.zw);
+  pos.xy /= -pos.z;
+  gl_Position = pos;
   ex_col = in_col;
 }

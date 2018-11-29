@@ -74,7 +74,7 @@ void init()
 
   unif_loc[UNIF_ROTM1] = glGetUniformLocation (prog, "rotm1");
   unif_loc[UNIF_ROTM2] = glGetUniformLocation (prog, "rotm2");
-  unif_loc[UNIF_MOVV]  = glGetUniformLocation (prog, "movv");
+  unif_loc[UNIF_MOVV]  = glGetUniformLocation (prog, "movv" );
 
   float
     rotm2[3][3] =
@@ -95,6 +95,9 @@ void init()
   glEnable (GL_DEPTH_TEST);
   glDepthFunc (GL_GREATER);
   glClearDepth (-1.0);
+
+  glEnable (GL_MULTISAMPLE);
+  glEnable (GL_SAMPLE_SHADING);
 }
 
 GLuint load_shaders(char *vpath, char *fpath)
