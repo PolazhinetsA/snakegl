@@ -17,4 +17,4 @@ Controls:
 SPACE - pause
 ```
 
-P.S. multisampling was added on recent commit, which is heavily dependent on whether you use a nice discrete GPU, say, NVIDIA, or something integrated, like IntelHD. If you run the game and end up with "all-black" instead of any rendering, just erase out the keyword "sample", which appears once in fragment shader source file "snakegl.frag" (no need to recompile anything).
+P.S. multisampling was added on recent commit, which is heavily dependent on whether you use a nice discrete GPU, say, NVIDIA, or something integrated, like IntelHD. If you run the game and end up with "all-black" instead of any rendering, just erase out the keyword "sample", which appears once in fragment shader source file "snakegl.frag" (no need to recompile anything), and it should work well, unless you can't handle an aliased snake.
