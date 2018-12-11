@@ -16,3 +16,5 @@ Controls:
 .     - turn CCW
 SPACE - pause
 ```
+
+P.S. multisampling was added on recent commit, which is heavily dependent on your GPU. Just erase out the keyword "sample" in fragment shader source file "snakegl.frag" (no need to recompile anything).
