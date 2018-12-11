@@ -17,4 +17,4 @@ Controls:
 SPACE - pause
 ```
 
-P.S. multisampling was added on recent commit, which is heavily dependent on your GPU. Just erase out the keyword "sample" in fragment shader source file "snakegl.frag" (no need to recompile anything).
+P.S. multisampling was added on recent commit, which is heavily dependent on your GPU. If you run the game and end up with "all-black" instead of any rendering, just erase out the keyword "sample" in fragment shader source file "snakegl.frag" (no need to recompile anything).
