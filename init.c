@@ -115,20 +115,26 @@ void init()
 
 GLuint load_shaders(char *vpath, char *fpath)
 {
-  int fd1, fd2;
-  struct stat st1, st2;
-  fd1 = open (vpath, O_RDONLY);
-  fd2 = open (fpath, O_RDONLY);
-  fstat (fd1, &st1);
-  fstat (fd2, &st2);
-  char buf1[st1.st_size + 1],
-       buf2[st2.st_size + 1],
-       *pbuf1 = buf1,
-       *pbuf2 = buf2;
-  buf1[read (fd1, buf1, st1.st_size)] = '\0';
-  buf2[read (fd2, buf2, st2.st_size)] = '\0';
-  close (fd1);
-  close (fd2);
+  FILE *file;
+  int sz;
+
+  file = fopen (vpath, "r");
+  fseek (file, 0, SEEK_END);
+  sz = ftell (file);
+  rewind (file);
+  char buf1[sz+1], *pbuf1 = buf1;
+  fread (buf1, 1, sz, file);
+  buf1[sz] = '\0';
+  fclose (file);
+
+  file = fopen (fpath, "r");
+  fseek (file, 0, SEEK_END);
+  sz = ftell (file);
+  rewind (file);
+  char buf2[sz+1], *pbuf2 = buf2;
+  fread (buf2, 1, sz, file);
+  buf2[sz] = '\0';
+  fclose (file);
 
   int vert_shader = glCreateShader (GL_VERTEX_SHADER),
       frag_shader = glCreateShader (GL_FRAGMENT_SHADER);
@@ -141,7 +147,7 @@ GLuint load_shaders(char *vpath, char *fpath)
   glGetShaderiv (vert_shader, GL_COMPILE_STATUS, &status1);
   glGetShaderiv (frag_shader, GL_COMPILE_STATUS, &status2);
 
-  if (! (status1 && status2)) {
+  if (!status1 || !status2) {
     GLsizei sz, len1, len2;
     glGetShaderiv (vert_shader, GL_INFO_LOG_LENGTH, &len1);
     glGetShaderiv (frag_shader, GL_INFO_LOG_LENGTH, &len2);
