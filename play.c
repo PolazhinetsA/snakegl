@@ -5,6 +5,11 @@ extern struct snake_t snake;
 
 void draw_func()
 {
+  glBindFramebuffer (GL_DRAW_FRAMEBUFFER, fbuf);
+  glViewport (0, 0, width/4, width/4);
+  glUniform1f (unif_loc[UNIF_ARF], 1);
+  glUniform1i (unif_loc[UNIF_TOPB], GL_TRUE);
+
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   for (int i = 0; i < N * M; ++i) {
     if (((char*) field)[i])
@@ -13,6 +18,26 @@ void draw_func()
     else
       glDrawElementsBaseVertex (GL_TRIANGLE_STRIP,  4, GL_UNSIGNED_BYTE, (void*)0, i*8);
   }
+
+  glBindFramebuffer (GL_READ_FRAMEBUFFER, fbuf);
+  glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
+  glViewport (0, 0, width, height);
+  glUniform1f (unif_loc[UNIF_ARF], (float) height / width);
+  glUniform1i (unif_loc[UNIF_TOPB], GL_FALSE);
+
+  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  for (int i = 0; i < N * M; ++i) {
+    if (((char*) field)[i])
+      glDrawElementsInstancedBaseVertex (GL_TRIANGLE_STRIP, 15, GL_UNSIGNED_BYTE, (void*)5,
+                                         ((char*)field)[i] == Fo ? 1 : 2, i*8);
+    else
+      glDrawElementsBaseVertex (GL_TRIANGLE_STRIP,  4, GL_UNSIGNED_BYTE, (void*)0, i*8);
+  }
+
+  glBlitFramebuffer (0, 0, width/4, width/4, 0, 0, width/4, width/4,
+                     GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+  glutSwapBuffers();
   glFlush();
 }
 
@@ -104,4 +129,10 @@ void keyb_func (unsigned char key, int x, int y)
     case '.': snake.dir = 1 + (snake.dir+2) % 4; break;
     case ' ': zpause = !zpause; break;
   }
+}
+
+void resz_func (int w, int h)
+{
+  width = w;
+  height = h;
 }

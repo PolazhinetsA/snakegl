@@ -3,10 +3,11 @@
 char field[N][M];
 struct snake_t snake;
 
-GLuint vao,
-       vbo,
-       ebo,
-       prog;
+GLuint
+  width, height,
+  vao, vbo, ebo,
+  fbuf, rbuf[RBUF_NUM],
+  prog;
 
 GLint unif_loc[UNIF_NUM];
 
@@ -75,6 +76,8 @@ void init()
   unif_loc[UNIF_ROTM1] = glGetUniformLocation (prog, "rotm1");
   unif_loc[UNIF_ROTM2] = glGetUniformLocation (prog, "rotm2");
   unif_loc[UNIF_MOVV]  = glGetUniformLocation (prog, "movv" );
+  unif_loc[UNIF_ARF]   = glGetUniformLocation (prog, "arf"  );
+  unif_loc[UNIF_TOPB]  = glGetUniformLocation (prog, "topb" );
 
   float
     rotm2[3][3] =
@@ -90,14 +93,24 @@ void init()
   rotm2[2][2] =  cos (1.0);
 
   glUniformMatrix3fv (unif_loc[UNIF_ROTM2], 1, GL_FALSE, rotm2);
-  glUniform3fv       (unif_loc[UNIF_MOVV],  1,           movv);
+  glUniform3fv (unif_loc[UNIF_MOVV], 1, movv);
+
+  glGenRenderbuffers (RBUF_NUM, rbuf);
+  glBindRenderbuffer (GL_RENDERBUFFER, rbuf[RBUF_COL]);
+  glRenderbufferStorage (GL_RENDERBUFFER, GL_RGBA, 512, 512);
+  glBindRenderbuffer (GL_RENDERBUFFER, rbuf[RBUF_DEP]);
+  glRenderbufferStorage (GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+
+  glGenFramebuffers (1, &fbuf);
+  glBindFramebuffer (GL_DRAW_FRAMEBUFFER, fbuf);
+  glFramebufferRenderbuffer (GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                             GL_RENDERBUFFER, rbuf[RBUF_COL]);
+  glFramebufferRenderbuffer (GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                             GL_RENDERBUFFER, rbuf[RBUF_DEP]);
 
   glEnable (GL_DEPTH_TEST);
   glDepthFunc (GL_GREATER);
   glClearDepth (-1.0);
-
-  glEnable (GL_MULTISAMPLE);
-  glEnable (GL_SAMPLE_SHADING);
 }
 
 GLuint load_shaders(char *vpath, char *fpath)

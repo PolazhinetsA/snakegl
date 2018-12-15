@@ -14,7 +14,9 @@
 
 enum {No, Ri, Do, Le, Up, Fo};
 
-enum {UNIF_ROTM1, UNIF_ROTM2, UNIF_MOVV, UNIF_NUM};
+enum {UNIF_ROTM1, UNIF_ROTM2, UNIF_MOVV, UNIF_ARF, UNIF_TOPB, UNIF_NUM};
+
+enum {RBUF_COL, RBUF_DEP, RBUF_NUM};
 
 struct snake_t {
   int hx, hy, tx, ty, dir;
@@ -23,9 +25,11 @@ struct snake_t {
 extern char field[N][M];
 extern struct snake_t snake;
 
-extern GLuint vao_id,
-              vbo_id,
-              prog_id;
+extern GLuint
+  width, height,
+  vao, vbo, ebo,
+  fbuf, rbuf[RBUF_NUM],
+  prog;
 
 extern GLint unif_loc[UNIF_NUM];
 
@@ -36,3 +40,4 @@ void draw_func();
 void move_func (int);
 void rot_func (int);
 void keyb_func (unsigned char, int, int);
+void resz_func (int, int);
